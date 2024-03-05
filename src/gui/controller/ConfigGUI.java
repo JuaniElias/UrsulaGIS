@@ -65,6 +65,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
@@ -930,6 +931,26 @@ public class ConfigGUI extends AbstractGUIController{
 			hBoxTotal.getChildren().add(importeTotalLabel);		
 			v.getChildren().add(hBoxTotal);
 
+			// Listener para actualizar el total
+			data.addListener((ListChangeListener<? super OrdenCompraItem>) c -> {
+				NumberFormat numberFormatUpdated = Messages.getNumberFormat();
+		        // Dejar 2 decimales nada mas
+		        numberFormat.setMaximumFractionDigits(2);
+				
+				
+			    while (c.next()) {
+			        if (c.wasAdded() || c.wasRemoved() || c.wasUpdated()) {
+			            // Recalculate the total whenever the data changes
+			            oc.calcImporteTotal();
+			            // Update the label displaying the total
+			            Double totalUpdated = oc.getImporteTotal();
+			            String totalStringUpdated = numberFormatUpdated.format(totalUpdated);
+			            importeTotalLabel.setText("Importe total: $" + totalStringUpdated);
+			        }
+			    }
+			});
+			
+			
 			HBox h = new HBox();
 
 			Button guardarB = new Button(Messages.getString("JFXMain.saveAction"));//TODO traducir
